@@ -19,7 +19,7 @@ void main() {
   themedWidgetBuilder: (context, theme) {
         return MaterialApp(
           theme: theme,
-          title: "رواية العهد",
+          title: "الجنون في القنينة",
      debugShowCheckedModeBanner: false,
     home: SplashScreen(),
   );}));

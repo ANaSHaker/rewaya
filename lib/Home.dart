@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:avatar_glow/avatar_glow.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,7 +12,9 @@ class HomePage extends KFDrawerContent {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+  AnimationController controller;
+  Animation<Color> _colorAnim;
   int _actualPageNumber = 1, _allPagesCount = 0;
   bool isSampleDoc = true;
   PdfController _pdfController;
@@ -21,6 +24,21 @@ class _HomePageState extends State<HomePage> {
     _pdfController = PdfController(
       document: PdfDocument.openAsset("assets/mypdf.pdf"),
     );
+
+    controller = AnimationController(duration: Duration(seconds: 3), vsync: this);
+    _colorAnim = ColorTween(begin: Colors.cyan,end: Colors.green)
+        .animate(controller)
+      ..addListener(() { setState(() {}); })
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          controller.reset();
+          controller.forward();
+        } else if (status == AnimationStatus.dismissed) {
+          controller.forward();
+        }
+      });
+    controller.forward();
+
     super.initState();
   }
 
@@ -35,7 +53,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:  Text("رواية العهد",
+        title:  Text("الجنون في القنينة",
           style: TextStyle(
             fontSize: 20.0,
             fontStyle: FontStyle.italic,
@@ -48,9 +66,60 @@ class _HomePageState extends State<HomePage> {
             Icons.menu,
           ),
           onPressed: widget.onMenuPressed,),
+        actions: [
+          Visibility(
+              visible: true,
+              child: AvatarGlow(
+                animate: true,
+                endRadius: 45.0,
+                showTwoGlows: true,
+                duration: const Duration(milliseconds:1500),
+                repeatPauseDuration: const Duration(milliseconds: 100),
+                repeat: true,
+                child:  IconButton(
+                  icon: Icon(Icons.navigate_before,color: _colorAnim.value,),
+                  onPressed: () {
+                    _pdfController.previousPage(
+                      curve: Curves.ease,
+                      duration: Duration(milliseconds: 100),
+                    );
+                  },
+                ),)),
+
+          Visibility(
+            visible: true,
+            child: AvatarGlow(
+              animate: true,
+              endRadius: 45.0,
+              showTwoGlows: true,
+              duration: const Duration(milliseconds:1500),
+              repeatPauseDuration: const Duration(milliseconds: 100),
+              repeat: true,
+              child: IconButton(
+                icon: Icon(Icons.navigate_next,color: _colorAnim.value,),
+                onPressed: () {
+                  _pdfController.nextPage(
+                    curve: Curves.ease,
+                    duration: Duration(milliseconds: 100),
+                  );
+                },
+              ),),
+          ),
+        ],
 
 
 
+      ),
+
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton:  Padding(
+        padding: const EdgeInsets.only(bottom:55.0),
+        child: FloatingActionButton.extended(
+            backgroundColor: _colorAnim.value,
+            icon: const Icon(Icons.add),
+            label: Text('$_actualPageNumber / $_allPagesCount',),
+            onPressed: (){}
+            ),
       ),
         body:  PdfView(
           documentLoader: Center(child: CircularProgressIndicator()),

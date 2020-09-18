@@ -32,7 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
              baseColor: Colors.white,
              highlightColor: Color(0xff2b343b),
              child: Text(
-               "رواية العهد ",
+               "الجنون في القنينة ",
                style: TextStyle(
                    fontSize: 35, fontWeight: FontWeight.w900, letterSpacing: 1.2),
              ),
